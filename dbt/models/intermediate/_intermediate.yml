@@ -1,0 +1,25 @@
+version: 2
+
+models:
+  - name: int_eligibility_spans
+    description: >
+      Coverage spans with overlaps removed: when two spans overlap, the earlier one ends the day
+      before the later one starts. Open spans have a NULL termination_date.
+    columns:
+      - name: eligibility_span_id
+        data_tests: [unique, not_null]
+
+  - name: int_medical_claim_chains
+    description: >
+      One row per claim version with the root (original) claim of its chain. The final version is the
+      deepest link; a chain whose final version is a void (frequency 8) is voided as a whole.
+    columns:
+      - name: claim_id
+        data_tests: [unique, not_null]
+      - name: root_claim_id
+        data_tests: [not_null]
+
+  - name: int_medical_claim_line_totals
+    columns:
+      - name: claim_id
+        data_tests: [unique, not_null]

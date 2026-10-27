@@ -1,0 +1,63 @@
+version: 2
+
+sources:
+  - name: raw
+    description: >
+      Raw extracts from Pacific Crest source systems, landed as delivered.
+      CSV tables: every column VARCHAR, column names = the CSV header.
+      pharmacy_claims: one VARIANT column named RAW_RECORD per JSON line.
+    database: "{{ env_var('PCH_RAW_DATABASE', 'HEALTH_DEV') }}"
+    schema: "{{ env_var('PCH_RAW_SCHEMA', 'RAW') }}"
+    config:
+      loaded_at_field: "try_to_timestamp(_extract_ts)"
+      freshness:
+        # The sample extract is dated 2026-07-31; tighten these once you load on a schedule.
+        warn_after: {count: 120, period: day}
+        error_after: {count: 365, period: day}
+
+    tables:
+      - name: members
+        description: Enrollment system member demographics (FACETS, LEGACY_MMIS, ENROLL_PORTAL). Contains PHI.
+        columns:
+          - name: member_id
+          - name: ssn
+            description: PHI. Dropped in staging; must never reach a mart.
+
+      - name: eligibility
+        description: One row per coverage span. Open spans have a NULL or 9999-12-31 termination date.
+
+      - name: plans
+        description: Plan configuration, one row per plan per benefit year.
+        config: {freshness: null}
+
+      - name: providers
+        description: Credentialing extract. One row per NPI per change (address or network status).
+
+      - name: medical_claims_header
+        description: Claims adjudication headers. One row per claim version; re-sent extract files contain duplicates.
+
+      - name: medical_claims_line
+        description: Claims adjudication service lines.
+
+      - name: pharmacy_claims
+        description: PBM fills and reversals as nested JSON in RAW_RECORD.
+        config:
+          loaded_at_field: "try_to_timestamp(raw_record:_extract_ts::string)"
+
+      - name: prior_authorizations
+        description: Utilization management requests and decisions.
+
+      - name: ref_icd10_dx
+        config: {freshness: null}
+      - name: ref_cpt_hcpcs
+        config: {freshness: null}
+      - name: ref_revenue_codes
+        config: {freshness: null}
+      - name: ref_drg
+        config: {freshness: null}
+      - name: ref_ndc_drugs
+        config: {freshness: null}
+      - name: ref_place_of_service
+        config: {freshness: null}
+      - name: ref_denial_reasons
+        config: {freshness: null}

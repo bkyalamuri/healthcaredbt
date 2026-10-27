@@ -1,0 +1,130 @@
+version: 2
+
+models:
+  - name: stg_members
+    description: One row per member. Names, DOB and contact details are PHI; SSN is dropped here.
+    columns:
+      - name: member_id
+        data_tests: [unique, not_null]
+      - name: subscriber_id
+        data_tests: [not_null]
+      - name: gender
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['M', 'F', 'U']
+      - name: date_of_birth
+        description: Parsed from three source formats. NULL means a format we don't handle yet.
+        data_tests:
+          - not_null:
+              config: {severity: warn}
+
+  - name: stg_eligibility
+    description: One row per coverage span as delivered; may contain overlapping retro rows.
+    columns:
+      - name: member_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_members')
+                field: member_id
+      - name: line_of_business
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Medicaid', 'Commercial', 'Medicare Advantage']
+      - name: effective_date
+        data_tests: [not_null]
+
+  - name: stg_plans
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['plan_id', 'benefit_year']
+
+  - name: stg_providers
+    description: One row per NPI per version.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['npi', 'valid_from']
+    columns:
+      - name: network_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['in', 'out']
+
+  - name: stg_medical_claims_header
+    description: One row per claim version after removing re-sent duplicates.
+    columns:
+      - name: claim_id
+        data_tests: [unique, not_null]
+      - name: claim_frequency_code
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['1', '7', '8']
+      - name: claim_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['paid', 'denied', 'pended', 'void']
+      - name: claim_type
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['professional', 'institutional']
+      - name: service_from_date
+        data_tests: [not_null]
+      - name: previous_claim_id
+        description: Set on replacements and voids; points at the version being changed.
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_medical_claims_header')
+                field: claim_id
+              config: {severity: warn}
+
+  - name: stg_medical_claims_line
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: ['claim_id', 'line_number']
+    columns:
+      - name: claim_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_medical_claims_header')
+                field: claim_id
+
+  - name: stg_pharmacy_claims
+    columns:
+      - name: rx_claim_id
+        data_tests: [unique, not_null]
+      - name: claim_status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['paid', 'rejected', 'reversed']
+
+  - name: stg_prior_authorizations
+    columns:
+      - name: auth_id
+        data_tests: [unique, not_null]
+
+  - name: stg_ref_icd10_dx
+    columns:
+      - name: dx_code
+        data_tests: [unique, not_null]
+  - name: stg_ref_cpt_hcpcs
+    columns:
+      - name: procedure_code
+        data_tests: [unique, not_null]
+  - name: stg_ref_ndc_drugs
+    columns:
+      - name: ndc
+        data_tests: [unique, not_null]

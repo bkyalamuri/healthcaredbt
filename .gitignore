@@ -1,0 +1,15 @@
+# dbt
+dbt/target/
+dbt/dbt_packages/
+dbt/logs/
+dbt/.user.yml
+profiles.yml
+
+# python
+__pycache__/
+*.pyc
+.venv/
+
+# local
+.DS_Store
+*.duckdb

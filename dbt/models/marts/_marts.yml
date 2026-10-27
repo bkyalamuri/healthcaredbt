@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: fct_medical_claims
+    description: >
+      AE-101 claim of record. Grain: one row per claim chain that was not voided, at its final version.
+      Owner: Claims Operations. Refresh: daily after the adjudication extract lands.
+      Amounts come from the service lines; header_paid_amt is kept so mismatches can be reconciled.
+      Rows with data problems are flagged (is_* / has_*), never dropped.
+    columns:
+      - name: claim_id
+        description: The final version's claim ID.
+        data_tests: [unique, not_null]
+      - name: root_claim_id
+        description: The original claim that started the chain.
+        data_tests: [unique, not_null]
+      - name: member_sk
+        description: Hashed member key. The only member identifier allowed in marts (Compliance).
+        data_tests: [not_null]
+      - name: category_of_service
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['Inpatient Facility', 'Emergency Facility', 'Outpatient Facility',
+                         'Emergency Professional', 'Professional']
+      - name: claim_status
+        description: Voided chains are excluded, so 'void' never appears here.
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ['paid', 'denied', 'pended']
+      - name: paid_amt
+        data_tests: [not_null]
+      - name: is_orphan_member
+        description: Member not found in the enrollment extract.
+      - name: is_outside_eligibility
+        description: No coverage span covers the service-from date.
+      - name: has_header_line_mismatch
+        description: Header paid differs from the sum of line paid by more than $0.01.
+
+  - name: fct_medical_claim_lines
+    description: "AE-101 service lines for fct_medical_claims. Grain: one row per claim line."
+    columns:
+      - name: claim_line_id
+        data_tests: [unique, not_null]
+      - name: claim_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('fct_medical_claims')
+                field: claim_id

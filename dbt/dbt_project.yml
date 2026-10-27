@@ -1,0 +1,36 @@
+name: pacific_crest
+version: "0.1.0"
+config-version: 2
+profile: pacific_crest
+
+model-paths: ["models"]
+macro-paths: ["macros"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+seed-paths: ["seeds"]
+snapshot-paths: ["snapshots"]
+
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Business rules every model shares. Changing one here changes it everywhere.
+  coverage_start_date: "2024-01-01"
+  coverage_end_date: "2026-06-30"
+  extract_date: "2026-07-31"
+
+models:
+  pacific_crest:
+    +materialized: view
+    staging:
+      +schema: staging
+      +materialized: view
+    intermediate:
+      +schema: intermediate
+      +materialized: view
+    marts:
+      +schema: marts
+      +materialized: table
+
+tests:
+  pacific_crest:
+    +store_failures: false

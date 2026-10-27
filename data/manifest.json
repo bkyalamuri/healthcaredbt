@@ -1,0 +1,97 @@
+{
+  "scale": 0.1,
+  "seed": 42,
+  "extract_ts": "2026-07-31 23:45:00",
+  "coverage_window": [
+    "2024-01-01",
+    "2026-06-30"
+  ],
+  "row_counts": {
+    "eligibility": 24846,
+    "medical_claims_header": 178452,
+    "medical_claims_line": 347055,
+    "members": 20000,
+    "pharmacy_claims": 247826,
+    "plans": 63,
+    "prior_authorizations": 6235,
+    "providers": 3396,
+    "ref_cpt_hcpcs": 76,
+    "ref_denial_reasons": 9,
+    "ref_drg": 12,
+    "ref_icd10_dx": 67,
+    "ref_ndc_drugs": 30,
+    "ref_place_of_service": 12,
+    "ref_revenue_codes": 16
+  },
+  "files": {
+    "eligibility": [
+      "eligibility_20260731_001.csv.gz"
+    ],
+    "medical_claims_header": [
+      "medical_claims_header_20260731_001.csv.gz",
+      "medical_claims_header_resend_20260801_001.csv.gz"
+    ],
+    "medical_claims_line": [
+      "medical_claims_line_20260731_001.csv.gz",
+      "medical_claims_line_20260731_002.csv.gz",
+      "medical_claims_line_resend_20260801_001.csv.gz"
+    ],
+    "members": [
+      "members_20260731_001.csv.gz"
+    ],
+    "pharmacy_claims": [
+      "pharmacy_claims_20260731_001.json.gz"
+    ],
+    "plans": [
+      "plans_20260731_001.csv.gz"
+    ],
+    "prior_authorizations": [
+      "prior_authorizations_20260731_001.csv.gz"
+    ],
+    "providers": [
+      "providers_20260731_001.csv.gz"
+    ],
+    "ref_cpt_hcpcs": [
+      "ref_cpt_hcpcs_20260731_001.csv.gz"
+    ],
+    "ref_denial_reasons": [
+      "ref_denial_reasons_20260731_001.csv.gz"
+    ],
+    "ref_drg": [
+      "ref_drg_20260731_001.csv.gz"
+    ],
+    "ref_icd10_dx": [
+      "ref_icd10_dx_20260731_001.csv.gz"
+    ],
+    "ref_ndc_drugs": [
+      "ref_ndc_drugs_20260731_001.csv.gz"
+    ],
+    "ref_place_of_service": [
+      "ref_place_of_service_20260731_001.csv.gz"
+    ],
+    "ref_revenue_codes": [
+      "ref_revenue_codes_20260731_001.csv.gz"
+    ]
+  },
+  "injected_issues": {
+    "adjustment_replacement_rows": 9379,
+    "adjustment_void_rows": 1503,
+    "auths_without_claim": 813,
+    "claims_not_yet_received_dropped": 2860,
+    "claims_outside_eligibility": 439,
+    "duplicate_header_rows": 887,
+    "duplicate_line_rows": 1706,
+    "eligibility_9999_sentinel": 4909,
+    "eligibility_overlap_rows": 100,
+    "future_service_dates": 37,
+    "header_line_paid_mismatch": 855,
+    "member_months": 450477,
+    "members_dob_non_iso": 5215,
+    "negative_allowed_errors": 32,
+    "orphan_member_claims": 516,
+    "orphan_npi_claims": 904,
+    "pharmacy_hyphenated_ndc": 11969,
+    "pharmacy_reversals": 6937,
+    "providers_with_history_rows": 396
+  }
+}

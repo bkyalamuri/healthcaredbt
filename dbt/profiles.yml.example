@@ -1,0 +1,16 @@
+# Copy to ~/.dbt/profiles.yml (or set DBT_PROFILES_DIR) and fill in your account.
+# Keep secrets in environment variables; never commit a real profiles.yml.
+pacific_crest:
+  target: dev
+  outputs:
+    dev:
+      type: snowflake
+      account: "{{ env_var('SNOWFLAKE_ACCOUNT') }}"        # e.g. abc12345.us-west-2
+      user: "{{ env_var('SNOWFLAKE_USER') }}"
+      password: "{{ env_var('SNOWFLAKE_PASSWORD') }}"
+      role: "{{ env_var('SNOWFLAKE_ROLE', 'SYSADMIN') }}"
+      warehouse: "{{ env_var('SNOWFLAKE_WAREHOUSE', 'COMPUTE_WH') }}"  # an X-Small is plenty
+      database: HEALTH_DEV
+      schema: "dbt_{{ env_var('USER', 'dev') | lower }}"   # your personal dev schema
+      threads: 4
+      client_session_keep_alive: false
